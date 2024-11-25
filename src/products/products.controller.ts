@@ -11,8 +11,9 @@ import {
   Query,
 } from '@nestjs/common';
 import { PRODUCT_SERVICE } from '../config';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { PaginationDto } from '../common/dto/pagination.dto';
+import { catchError, firstValueFrom } from 'rxjs';
 
 @Controller('products')
 export class ProductsController {
@@ -31,8 +32,26 @@ export class ProductsController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return 'esta funcion retorna el producto con id ' + id;
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    // option 1 con Observable
+
+    // try {
+    // firstValueFrom me permite manjarlo como una promesa y este recibe un Observable como argumento y dispara el suscribe
+    //   const product = await firstValueFrom(
+    //     this.productsClient.send({ cmd: 'find_one_product' }, { id }),
+    //   );
+    //   return product;
+    // } catch (error) {
+    //   throw new RpcException(error);
+    // }
+
+    // option 2 con Promises
+
+    return this.productsClient.send({ cmd: 'find_one_product' }, { id }).pipe(
+      catchError((err) => {
+        throw new RpcException(err);
+      }),
+    );
   }
 
   @Delete(':id')
