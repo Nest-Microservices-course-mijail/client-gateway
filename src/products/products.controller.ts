@@ -16,7 +16,6 @@ import { PaginationDto } from '../common/dto/pagination.dto';
 import { catchError, firstValueFrom } from 'rxjs';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateProductDto } from './dto/create-product.dto';
-import { error } from 'console';
 
 @Controller('products')
 export class ProductsController {
