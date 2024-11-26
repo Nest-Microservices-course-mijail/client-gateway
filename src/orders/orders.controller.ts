@@ -12,7 +12,7 @@ import {
 import { ORDERS_SERVICE } from '../config/services';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { CreateOrderDto, OrderPaginationDto, StatusDto } from './dto';
-import { firstValueFrom } from 'rxjs';
+import { catchError, firstValueFrom } from 'rxjs';
 import { PaginationDto } from '../common';
 
 @Controller('orders')
@@ -22,8 +22,15 @@ export class OrdersController {
   ) {}
 
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersClient.send('createOrder', createOrderDto);
+  async create(@Body() createOrderDto: CreateOrderDto) {
+    try {
+      const order = await firstValueFrom(
+        this.ordersClient.send('createOrder', createOrderDto),
+      );
+      return order;
+    } catch (error) {
+      throw new RpcException(error);
+    }
   }
 
   @Get()
