@@ -22,6 +22,8 @@ async function bootstrap() {
 
   await app.listen(envs.port);
 
+  console.log('camboio');
+
   logger.log(`Gateway running on port ${envs.port}`);
 }
 bootstrap();
