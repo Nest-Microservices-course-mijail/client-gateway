@@ -39,13 +39,5 @@ export class AuthController {
   @Get('verify')
   async verifyUser(@User() user: CurrentUser, @Token() token: string) {
     return { user, token };
-    try {
-      const order = await firstValueFrom(
-        this.client.send('auth.verify.user', ''),
-      );
-      return order;
-    } catch (error) {
-      throw new RpcException(error);
-    }
   }
 }
