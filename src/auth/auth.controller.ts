@@ -1,8 +1,11 @@
-import { Controller, Post, Inject, Get, Body } from '@nestjs/common';
+import { Controller, Post, Inject, Get, Body, UseGuards } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { NATS_SERVICE } from '../config/services';
 import { firstValueFrom } from 'rxjs';
 import { LoginUserDto, RegisterUserDto } from './dto';
+import { AuthGuard } from './guards/auth.guard';
+import { Token, User } from './decorators';
+import { CurrentUser } from './interfaces/current-user.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -32,8 +35,10 @@ export class AuthController {
     }
   }
 
+  @UseGuards(AuthGuard)
   @Get('verify')
-  async verifyUser() {
+  async verifyUser(@User() user: CurrentUser, @Token() token: string) {
+    return { user, token };
     try {
       const order = await firstValueFrom(
         this.client.send('auth.verify.user', ''),
